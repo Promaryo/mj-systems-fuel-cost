@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MJ Systems</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  background: radial-gradient(circle at top, #0f172a, #020617);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* CONTAINER */
+.container {
+  width: 100%;
+  max-width: 420px;
+  padding: 20px;
+}
+
+/* TITLE */
+h1 {
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #94a3b8;
+  margin-bottom: 25px;
+}
+
+/* CARD */
+.card {
+  background: rgba(30,41,59,0.6);
+  backdrop-filter: blur(20px);
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.05);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 60px rgba(34,197,94,0.2);
+}
+
+/* INPUT */
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(2,6,23,0.7);
+  color: white;
+  outline: none;
+  transition: 0.2s;
+}
+
+input:focus {
+  border-color: #22c55e;
+  box-shadow: 0 0 12px rgba(34,197,94,0.4);
+}
+
+/* BUTTON */
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(34,197,94,0.4);
+}
+
+/* RESULT */
+.result {
+  margin-top: 15px;
+  padding: 15px;
+  border-radius: 12px;
+  background: rgba(2,6,23,0.8);
+  border: 1px solid rgba(255,255,255,0.05);
+  display: none;
+  animation: fadeIn 0.4s ease;
+}
+
+.result div {
+  margin: 6px 0;
+}
+
+.highlight {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(10px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+
+/* FOOTER */
+footer {
+  margin-top: 25px;
+  text-align: center;
+  color: #64748b;
+  font-size: 12px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>MJ Systems</h1>
+  <p class="subtitle">Fuel Calculator</p>
+
+  <div class="card">
+
+    <input type="number" id="km" placeholder="KM parcurși">
+    <input type="number" id="litri" placeholder="Litri consumați">
+    <input type="number" id="pret" placeholder="Preț / litru">
+
+    <button onclick="calc()">Calculează</button>
+
+    <div class="result" id="result">
+      <div>Consum: <span class="highlight" id="consum"></span> L/100km</div>
+      <div>Cost total: <span class="highlight" id="total"></span> RON</div>
+      <div>Cost /100km: <span class="highlight" id="cost100"></span> RON</div>
+    </div>
+
+  </div>
+
+  <footer>© 2026 MJ Systems</footer>
+
+</div>
+
+<script>
+async function calc() {
+  const km = Number(document.getElementById("km").value);
+  const litri = Number(document.getElementById("litri").value);
+  const pret = Number(document.getElementById("pret").value);
+
+  const resultDiv = document.getElementById("result");
+
+  try {
+    const res = await fetch("http://localhost:3000/calculate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ km, litri, pret })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error);
+      return;
+    }
+
+    document.getElementById("consum").innerText = data.consum;
+    document.getElementById("total").innerText = data.costTotal;
+    document.getElementById("cost100").innerText = data.cost100;
+
+    resultDiv.style.display = "block";
+
+  } catch (err) {
+    alert("Server error 😅");
+  }
+}
+</script>
+
+</body>
+</html>

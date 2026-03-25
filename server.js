@@ -1,24 +1,32 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
+// 🔥 SERVE UI
 app.get("/", (req, res) => {
-  res.send("API IS LIVE 🚀");
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 app.post("/calculate", (req, res) => {
-  const { km, litri, pret } = req.body;
+  let { km, litri, pret } = req.body;
 
-  if (!km || !litri || !pret) {
-    return res.status(400).json({ error: "Date lipsa" });
+  km = Number(km);
+  litri = Number(litri);
+  pret = Number(pret);
+
+  if (
+    isNaN(km) || isNaN(litri) || isNaN(pret)
+  ) {
+    return res.status(400).json({ error: "Date invalide" });
   }
 
   if (km <= 0 || litri <= 0 || pret <= 0) {
-    return res.status(400).json({ error: "Valori invalide" });
+    return res.status(400).json({ error: "Valorile trebuie sa fie > 0" });
   }
 
   if (litri > 200) {
@@ -39,5 +47,5 @@ app.post("/calculate", (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
