@@ -12,36 +12,41 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
+// 🔥 API
 app.post("/calculate", (req, res) => {
-  let { km, litri, pret } = req.body;
+  try {
+    let { km, litri, pret } = req.body;
 
-  km = Number(km);
-  litri = Number(litri);
-  pret = Number(pret);
+    km = Number(km);
+    litri = Number(litri);
+    pret = Number(pret);
 
-  if (
-    isNaN(km) || isNaN(litri) || isNaN(pret)
-  ) {
-    return res.status(400).json({ error: "Date invalide" });
+    if (isNaN(km) || isNaN(litri) || isNaN(pret)) {
+      return res.status(400).json({ error: "Date invalide" });
+    }
+
+    if (km <= 0 || litri <= 0 || pret <= 0) {
+      return res.status(400).json({ error: "Valorile trebuie sa fie > 0" });
+    }
+
+    if (litri > 200) {
+      return res.status(400).json({ error: "Consum nerealist 😄" });
+    }
+
+    const consum = (litri / km) * 100;
+    const costTotal = litri * pret;
+    const cost100 = consum * pret;
+
+    res.json({
+      consum: consum.toFixed(2),
+      costTotal: costTotal.toFixed(2),
+      cost100: cost100.toFixed(2)
+    });
+
+  } catch (err) {
+    console.error("SERVER ERROR:", err);
+    res.status(500).json({ error: "Eroare server" });
   }
-
-  if (km <= 0 || litri <= 0 || pret <= 0) {
-    return res.status(400).json({ error: "Valorile trebuie sa fie > 0" });
-  }
-
-  if (litri > 200) {
-    return res.status(400).json({ error: "Consum nerealist 😄" });
-  }
-
-  const consum = (litri / km) * 100;
-  const costTotal = litri * pret;
-  const cost100 = consum * pret;
-
-  res.json({
-    consum: consum.toFixed(2),
-    costTotal: costTotal.toFixed(2),
-    cost100: cost100.toFixed(2)
-  });
 });
 
 const PORT = process.env.PORT || 3000;
