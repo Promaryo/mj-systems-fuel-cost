@@ -171,7 +171,7 @@ async function calc() {
   const resultDiv = document.getElementById("result");
 
   try {
-    const res = await fetch("http://localhost:3000/calculate", {
+    const res = await fetch("/calculate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
